@@ -1,13 +1,17 @@
-import { legacy_createStore as createStore, combineReducers } from "redux";
+import { configureStore } from "@reduxjs/toolkit";
+import counterReducer from "./counterSlice";
+import phoneReducer from "./phoneSlice";
+import todoReducer from "./todoSlice";
 
-import reducerCounter from "./reducers/reducerCounter";
-import reducerPhone from "./reducers/reducerPhone";
-import reducerTodo from "./reducers/reducerTodo";
-
-const combReducers = combineReducers({
-  counterReducer: reducerCounter,
-  phoneReducer: reducerPhone,
-  todoReducer: reducerTodo,
+const store = configureStore({
+  reducer: {
+    counterReducer,
+    phoneReducer,
+    todoReducer,
+  },
 });
-const store = createStore(combReducers);
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
 export default store;

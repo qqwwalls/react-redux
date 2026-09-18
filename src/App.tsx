@@ -2,25 +2,26 @@ import reactLogo from "./assets/react.svg";
 import reduxLogo from "/redux.svg";
 import "./App.css";
 import { useSelector, useDispatch } from "react-redux";
-import ITodo from "./redux/reducers/ITodo";
+import ITodo from "./redux/ITodo";
 import { useRef } from "react";
-import { ICounter, IPhone } from "./redux/reducers/IState";
+import { RootState, AppDispatch } from "./redux/store";
+import { up, down } from "./redux/counterSlice";
+import { addPhone, delPhone } from "./redux/phoneSlice";
+import { addTodoAction, delTodoAction, blockTodoAction, changeTodoAction } from "./redux/todoSlice";
 
 function App() {
   const inputRef: any = useRef();
-  const counter = useSelector(
-    (state: ICounter) => state.counterReducer.counter
-  );
-  const amount = useSelector((state: IPhone) => state.phoneReducer.amount);
-  const todos: ITodo[] = useSelector((state: any) => state.todoReducer.todos);
+  const counter = useSelector((state: RootState) => state.counterReducer.counter);
+  const amount = useSelector((state: RootState) => state.phoneReducer.amount);
+  const todos: ITodo[] = useSelector((state: RootState) => state.todoReducer.todos);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const up = () => dispatch({ type: "UP" });
-  const down = () => dispatch({ type: "DOWN" });
+  const handleUp = () => dispatch(up());
+  const handleDown = () => dispatch(down());
 
-  const add = () => dispatch({ type: "ADD", payload: 200 });
-  const del = () => dispatch({ type: "DEL", payload: 50 });
+  const add = () => dispatch(addPhone(200));
+  const del = () => dispatch(delPhone(50));
 
   const addTodo = () => {
     const title = inputRef.current.value.trim();
@@ -28,22 +29,22 @@ function App() {
       alert("Не можна зберігати порожні дані!");
       return;
     }
-    if (todos.some(todo => todo.title === title)) {
+    if (todos.some((todo) => todo.title === title)) {
       alert("Користувач з таким ім'ям вже існує!");
       return;
     }
-    dispatch({ type: "ADD_TODO", payload: { id: Date.now(), title, blocked: false } });
+    dispatch(addTodoAction({ id: Date.now(), title, blocked: false }));
     inputRef.current.value = "";
   };
 
   const blockTodo = (id: number) => {
-    dispatch({ type: "BLOCK_TODO", payload: id });
+    dispatch(blockTodoAction(id));
   };
 
   const changeTodo = (id: number) => {
     const newTitle = prompt("Введіть нове ім'я користувача:");
     if (newTitle && newTitle.trim() !== "") {
-      dispatch({ type: "CHANGE_TODO", payload: { id, title: newTitle.trim() } });
+      dispatch(changeTodoAction({ id, title: newTitle.trim() }));
     }
   };
 
@@ -54,7 +55,7 @@ function App() {
   }
 
   function removeTodo(id: number) {
-    dispatch({ type: "DEL_TODO", payload: id });
+    dispatch(delTodoAction(id));
   }
 
   return (
@@ -67,11 +68,11 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      `<h1>Redux + React</h1>
+      <h1>Redux + React</h1>
       <div className="card">
         <p>Counter {counter}</p>
-        <button onClick={up}>UP</button>
-        <button onClick={down}>DOWN</button>
+        <button onClick={handleUp}>UP</button>
+        <button onClick={handleDown}>DOWN</button>
       </div>
       <div className="card">
         <p>Phone {amount}</p>
